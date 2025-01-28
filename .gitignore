@@ -172,3 +172,5 @@ cython_debug/
 
 # Local blockchain
 chain/
+
+secret.txt
