@@ -175,4 +175,5 @@ chain/
 
 secret.txt
 
-package
+package*
+node_modules/
