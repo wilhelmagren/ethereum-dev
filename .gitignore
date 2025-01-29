@@ -174,3 +174,5 @@ cython_debug/
 chain/
 
 secret.txt
+
+package
