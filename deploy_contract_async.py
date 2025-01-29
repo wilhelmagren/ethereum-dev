@@ -4,15 +4,16 @@ This script deploys a smart contract to a local Ethereum chain over IPC running 
 Requires the user to provide the name of the smart contract to be deployed.
 
 File created: 2025-01-27
-Last updated: 2025-01-29
+Last updated: 2025-01-28
 
 """
 import argparse
 import json
+import asyncio
 import web3
 
 from eth_account import Account
-from web3 import Web3
+from web3 import AsyncWeb3
 from typing import Tuple
 
 
@@ -31,10 +32,10 @@ def read_contract_abi_and_bytecode(contract_name: str) -> Tuple[str, str]:
     with open(path + ".bin", "r") as f:
         bytecode = f.read()
 
-    return (abi, "0x" + bytecode)
+    return (abi, bytecode)
 
 
-def do_the_stuffs():
+async def do_the_stuffs():
     parser = argparse.ArgumentParser(
         prog="deploy_contract",
         usage=USAGE_STRING,
@@ -66,32 +67,27 @@ def do_the_stuffs():
 
     args = parser.parse_args()
 
-    w3 = Web3(Web3.IPCProvider(args.ipc_endpoint))
+    w3 = await AsyncWeb3(web3.providers.persistent.AsyncIPCProvider(args.ipc_endpoint))
 
-    if not w3.is_connected():
+    if not await w3.is_connected():
         print(f"[ERROR] could not connect to the IPC endpoint at: `{args.ipc_endpoint}`")
 
     password_file = args.password_file
     with open(password_file, "r") as f:
         password = f.read().strip()
 
-    print(f"[INFO] accounts: `{','.join(w3.eth.accounts)}`")
+    print(f"[INFO] accounts: `{','.join(await w3.eth.accounts)}`")
 
-    account = w3.eth.accounts[0]
+    account = (await w3.eth.accounts)[0]
 
     print(f"[INFO] setting default account to: {account}")
     w3.eth.default_account = account
 
     abi, bytecode = read_contract_abi_and_bytecode(args.contract)
     contract = w3.eth.contract(abi=abi, bytecode=bytecode)
-    tx_hash = contract.constructor().transact()
-
-    print(tx_hash)
-
-    """
-    tx = contract.constructor().build_transaction({
+    tx = await contract.constructor().build_transaction({
         "from": account,
-        "nonce": w3.eth.get_transaction_count(account),
+        "nonce": await w3.eth.get_transaction_count(account),
         "gas": 300000,
         "gasPrice": web3.Web3.to_wei("20", "gwei"),
     })
@@ -100,32 +96,23 @@ def do_the_stuffs():
     signed_tx = Account.sign_transaction(tx, private_key=password)
 
     print("[INFO] deploying contract...")
-    tx_hash = str(w3.eth.send_raw_transaction(signed_tx.raw_transaction).hex())
+    tx_address = await w3.eth.send_raw_transaction(signed_tx.raw_transaction)
 
     print("[INFO] waiting for receipt on transaction...")
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    tx_address = tx_receipt["contractAddress"]
+    tx_receipt = await w3.eth.wait_for_transaction_receipt(tx_address)
 
     print(f"[INFO] contract tx address: {tx_address}")
-    print(f"[INFO] contract tx receipt: {tx_hash}")
+    print(f"[INFO] contract tx receipt: {tx_receipt}")
 
-    DEPLOYMENT_INFO_FILE = "CONTRACT_DEPLOYMENT_INFO.json"
-
-    TX_DICT = {
-        "TX_HASH": tx_hash,
-        "CONTRACT_ADDRESS": tx_address,
-        "CONTRACT_ABI": abi,
-        "CONTRACT_BYTECODE": bytecode,
-    }
+    DEPLOYMENT_INFO_FILE = "CONTRACT_DEPLOYMENT_INFO.txt"
 
     with open(DEPLOYMENT_INFO_FILE, "w") as f:
-        json.dump(TX_DICT, f)
+        f.writelines([tx_address, tx_receipt])
 
     print(f"[INFO] wrote tx info to file: {DEPLOYMENT_INFO_FILE}")
     print("[INFO] all done, exiting!")
-    """
 
 
 if __name__ == "__main__":
-    do_the_stuffs()
+    asyncio.run(do_the_stuffs())
     
