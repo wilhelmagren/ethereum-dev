@@ -83,24 +83,10 @@ def do_the_stuffs():
     w3.eth.default_account = account
 
     abi, bytecode = read_contract_abi_and_bytecode(args.contract)
-    contract = w3.eth.contract(abi=abi, bytecode=bytecode)
-    tx_hash = contract.constructor().transact()
-
-    print(tx_hash)
-
-    """
-    tx = contract.constructor().build_transaction({
-        "from": account,
-        "nonce": w3.eth.get_transaction_count(account),
-        "gas": 300000,
-        "gasPrice": web3.Web3.to_wei("20", "gwei"),
-    })
-
-    print("[INFO] signing transaction...") 
-    signed_tx = Account.sign_transaction(tx, private_key=password)
 
     print("[INFO] deploying contract...")
-    tx_hash = str(w3.eth.send_raw_transaction(signed_tx.raw_transaction).hex())
+    contract = w3.eth.contract(abi=abi, bytecode=bytecode)
+    tx_hash = str(contract.constructor().transact().hex())
 
     print("[INFO] waiting for receipt on transaction...")
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
@@ -123,7 +109,6 @@ def do_the_stuffs():
 
     print(f"[INFO] wrote tx info to file: {DEPLOYMENT_INFO_FILE}")
     print("[INFO] all done, exiting!")
-    """
 
 
 if __name__ == "__main__":
