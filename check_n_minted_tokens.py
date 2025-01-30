@@ -1,10 +1,8 @@
 """
 """
 
-import web3
 import json
 
-from eth_account import Account
 from web3 import Web3
 
 
@@ -23,18 +21,10 @@ if __name__ == "__main__":
         abi=token_info["CONTRACT_ABI"],
     )
 
-    """
-    tx_name_hash = str(contract.functions.name().build_transaction({
-        "from": account,
-        "nonce": w3.eth.get_transaction_count(account),
-        "gas": 300000,
-        "gasPrice": web3.Web3.to_wei("20", "gwei"),
-    }).send_transaction().hex())
+    # name = str(contract.functions.greet().call())
+    # print(name)
 
-    tx_name_receipt = w3.eth.wait_for_transaction_receipt(tx_name_hash)
-    print(tx_name_receipt)
-    """
+    n_tokens = str(contract.functions.totalSupply().call())
+    print(n_tokens)
 
-    name = str(contract.functions.totalSupply().call())
-    print(name)
 
