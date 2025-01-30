@@ -1,6 +1,6 @@
 """
 
-Deposit an amount of money to the database. 
+Withdraw an amount of money from the database and token contract. 
 
 File created: 2025-01-30
 Last updated: 2025-01-30
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    query = "UPDATE accounts SET balance = balance + ? WHERE address = ?"
+    query = "UPDATE accounts SET balance = balance - ? WHERE address = ?"
     w3 = Web3(Web3.IPCProvider("./chain/execution/data/geth.ipc"))
     account = w3.eth.accounts[0]
     amount = int(args.amount)
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         cursor = sql.cursor()
         cursor.execute(query, (amount, account))
         sql.commit()
-        print(f"Added {args.amount} SEK to local db account `{account}`.")
+        print(f"Removing {args.amount} SEK from local db account `{account}`.")
 
     w3.eth.defaultAccount = account
 
@@ -47,9 +47,9 @@ if __name__ == "__main__":
     with open("./secret.txt") as f:
         password = f.read().strip()
 
-    print("Building chain transaction to mint tokens...")
+    print("Building chain transaction to burn tokens...")
     
-    tx = contract.functions.mint(account, amount).build_transaction({
+    tx = contract.functions.burn(account, amount).build_transaction({
         "from": account,
         "nonce": w3.eth.get_transaction_count(account),
         "gas": 3000000,
