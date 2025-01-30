@@ -177,3 +177,7 @@ secret.txt
 
 package*
 node_modules/
+
+ACCOUNT_ADDRESS.txt
+CONTRACT_DEPLOYMENT_INFO.json
+accounts.db
