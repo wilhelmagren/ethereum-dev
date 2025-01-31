@@ -102,6 +102,17 @@ def store_contract_info(name, abi, receipt):
         json.dump(info, f)
 
 
+def format_args(args, hows):
+    """"""
+    how = {
+        "string": str,
+        "int": int,
+        "address": str,
+    }
+
+    return [how[h](a) for h, a in zip(hows, args)]
+
+
 def deploy_contract(args: argparse.Namespace) -> None:
     """"""
 
@@ -125,7 +136,7 @@ def deploy_contract(args: argparse.Namespace) -> None:
     contract = w3.eth.contract(abi=contract_abi, bytecode=contract_bytecode)
 
     log.info("Making transaction to deploy contract, need confirmation in clef")
-    tx_hash = str(contract.constructor().transact().hex())
+    tx_hash = str(contract.constructor(*format_args(args.args, args.parse_args)).transact().hex())
     log.info(f"Transaction ok 0x{tx_hash}")
 
     log.info("Waiting for transaction receipt...")
@@ -156,9 +167,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="toggle verbosity (default: false)",
+        "-a", "--args",
+        nargs="+",
+        help="optional positional arguments for the constructor of the contract",
+    )
+
+    parser.add_argument(
+        "-p", "--parse-args",
+        nargs="+",
+        help="",
     )
 
     deploy_contract(parser.parse_args())

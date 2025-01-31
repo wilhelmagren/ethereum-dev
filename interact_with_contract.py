@@ -13,6 +13,15 @@ from eth_account import Account
 from web3 import Web3
 
 
+def format_args(args, hows):
+    how = {
+        "string": str,
+        "int": int,
+        "address": str,
+    }
+    return [how[h](a) for h, a in zip(hows, args)]
+
+
 def interact_with_contract(args: argparse.Namespace) -> None:
     """ """
 
@@ -36,7 +45,7 @@ def interact_with_contract(args: argparse.Namespace) -> None:
         private_key = f.read().strip()
 
     function = getattr(contract.functions, args.function)
-    fn_args = args.args
+    fn_args = format_args(args.args, args.parse_args)
 
     if args.interaction == "call":
         result = function(*fn_args).call()
@@ -80,6 +89,11 @@ if __name__ == "__main__":
         "-a", "--args",
         nargs="+",
         help="optional positional arguments to pass to the contract function",
+    )
+
+    parser.add_argument(
+        "--parse-args",
+        nargs="+",
     )
 
     parser.add_argument(

@@ -5,8 +5,8 @@ pragma solidity ^0.8.28;
 import "./IToken.sol";
 
 contract CarDeal {
-    address private _buyer;
-    address private _seller;
+    uint256 private _buyer;
+    uint256 private _seller;
     uint256 private _carId;
 
     uint256 private _price;
@@ -15,9 +15,9 @@ contract CarDeal {
     IToken private _buyerToken;
     IToken private _sellerToken;
 
-    event CarOwnerTransfer(address indexed buyer, address indexed seller, uint256 carId);
+    event CarOwnerTransfer(uint256 buyer, uint256 seller, uint256 carId);
 
-    constructor(address buyer, address seller, uint256 carId, uint256 price, IToken
+    constructor(uint256 buyer, uint256 seller, uint256 carId, uint256 price, IToken
                 buyerToken, IToken sellerToken) {
         _buyer = buyer;
         _seller = seller;
