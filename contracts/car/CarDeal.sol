@@ -5,44 +5,54 @@ pragma solidity ^0.8.28;
 import "./IToken.sol";
 
 contract CarDeal {
-    uint256 private _buyer;
-    uint256 private _seller;
+    address private _buyer;
+    address private _seller;
     uint256 private _carId;
+    string private _carName;
 
     uint256 private _price;
-    uint256 private _deposit;
+    uint256 private _depositedAmount;
 
     IToken private _buyerToken;
     IToken private _sellerToken;
 
-    event CarOwnerTransfer(uint256 buyer, uint256 seller, uint256 carId);
+    bool private _hasExecuted;
 
-    constructor(uint256 buyer, uint256 seller, uint256 carId, uint256 price, IToken
+    event CarOwnerTransfer(address buyer, address seller, uint256 carId, string carName,
+                           uint256 price);
+
+    constructor(address buyer, address seller, uint256 carId, string memory carName, uint256 price, IToken
                 buyerToken, IToken sellerToken) {
         _buyer = buyer;
         _seller = seller;
         _carId = carId;
+        _carName = carName;
         _price = price;
-        _deposit = 0;
+        _depositedAmount = 0;
         _buyerToken = buyerToken;
         _sellerToken = sellerToken;
+        _hasExecuted = false;
     }
 
     function deposit(uint256 amount) public {
-        _deposit += amount;
-        if (_deal_demands()) {
-            _execute_deal();
+        if (!_hasExecuted) {
+            _depositedAmount += amount;
+            if (_dealDemands()) {
+                _executeDeal();
+            }
         }
     }
 
-    function _deal_demands() private view returns (bool) {
-        return _deposit >= _price;
+    function _dealDemands() private view returns (bool) {
+        return _depositedAmount >= _price;
     }
 
-    function _execute_deal() internal {
+    function _executeDeal() internal {
+        _hasExecuted = true;
+
         _buyerToken.burn(_price);
         _sellerToken.mint(_price);
 
-        emit CarOwnerTransfer(_buyer, _seller, _carId);
+        emit CarOwnerTransfer(_buyer, _seller, _carId, _carName, _price);
     }
 }
