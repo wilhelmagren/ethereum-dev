@@ -1,11 +1,9 @@
 """
-
 This script deploys a new smart contract to a private PoS Ethereum devnet over IPC.
 Requires the user to provide the name of the smart contract to be deployed.
 
 File created: 2025-01-27
-Last updated: 2025-01-31
-
+Last updated: 2025-02-03
 """
 
 import argparse
@@ -18,7 +16,7 @@ from pathlib import Path
 
 
 USAGE_STRING = """
-Deploy a smart contract to a private PoS Ethereum devnet over IPC.
+\tDeploy a smart contract to a private PoS Ethereum devnet over IPC.
 """
 
 
@@ -135,8 +133,12 @@ def deploy_contract(args: argparse.Namespace) -> None:
 
     contract = w3.eth.contract(abi=contract_abi, bytecode=contract_bytecode)
 
+    constructor_args = []
+    if args.args is not None:
+        constructor_args = format_args(args.args, args.parse_args)
+
     log.info("Making transaction to deploy contract, need confirmation in clef")
-    tx_hash = str(contract.constructor(*format_args(args.args, args.parse_args)).transact().hex())
+    tx_hash = str(contract.constructor(*constructor_args).transact().hex())
     log.info(f"Transaction ok 0x{tx_hash}")
 
     log.info("Waiting for transaction receipt...")

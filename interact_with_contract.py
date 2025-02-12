@@ -2,7 +2,7 @@
 Interact with smart contracts on your private PoS Ethereum devnet over IPC.
 
 File created: 2025-01-31
-Last updated: 2025-01-31
+Last updated: 2025-02-03
 """
 
 import argparse
@@ -45,7 +45,10 @@ def interact_with_contract(args: argparse.Namespace) -> None:
         private_key = f.read().strip()
 
     function = getattr(contract.functions, args.function)
-    fn_args = format_args(args.args, args.parse_args)
+
+    fn_args = []
+    if args.args is not None:
+        fn_args = format_args(args.args, args.parse_args)
 
     if args.interaction == "call":
         result = function(*fn_args).call()
