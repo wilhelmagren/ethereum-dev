@@ -8,7 +8,6 @@ contract CarDeal {
     address private _buyer;
     address private _seller;
     uint256 private _carId;
-    string private _carName;
 
     uint256 private _price;
     uint256 private _depositedAmount;
@@ -18,15 +17,14 @@ contract CarDeal {
 
     bool private _hasExecuted;
 
-    event CarOwnerTransfer(address buyer, address seller, uint256 carId, string carName,
+    event CarOwnerTransfer(address buyer, address seller, uint256 carId,
                            uint256 price);
 
-    constructor(address buyer, address seller, uint256 carId, string memory carName, uint256 price, IToken
+    constructor(address buyer, address seller, uint256 carId, uint256 price, IToken
                 buyerToken, IToken sellerToken) {
         _buyer = buyer;
         _seller = seller;
         _carId = carId;
-        _carName = carName;
         _price = price;
         _depositedAmount = 0;
         _buyerToken = buyerToken;
@@ -53,6 +51,6 @@ contract CarDeal {
         _buyerToken.burn(_price);
         _sellerToken.mint(_price);
 
-        emit CarOwnerTransfer(_buyer, _seller, _carId, _carName, _price);
+        emit CarOwnerTransfer(_buyer, _seller, _carId, _price);
     }
 }
