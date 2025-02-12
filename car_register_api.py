@@ -5,19 +5,18 @@ File created: 2025-01-30
 Last updated: 2025-02-12
 """
 
-import json
+import sqlite3
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-
-CARS_DB = "./cars_db.json"
 
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+sql = sqlite3.connect("cars.db")
 
 @app.get("/")
 async def read_root():
@@ -26,8 +25,10 @@ async def read_root():
 
 @app.get("/cars", response_class=HTMLResponse)
 async def read_cars():
-    with open(CARS_DB, "rb") as f:
-        cars = json.loads(f.read())
+
+    cursor = sql.cursor()
+    cursor.execute("SELECT * FROM cars")
+    cars = cursor.fetchall()
 
     html_content = """
     <html>
@@ -38,13 +39,13 @@ async def read_cars():
     <h1>Car register</h1><ul>
     """
 
-    for car_id, car in cars.items():
+    for car in cars:
         html_content += f"""
         <li>
-            <span><strong>Id:</strong> {car_id}</span>
-            <span>Owner:   {car['owner']}</span>
-            <span>Price:   {car['price']} SEK</span>
-            <span>Previous owner:  {car['previous_owner']}</span>
+            <span><strong>Id:</strong> {car[0]}</span>
+            <span>Owner:   {car[1]}</span>
+            <span>Previous owner:  {car[2]}</span>
+            <span>Price:   {car[3]} SEK</span>
         </li>
         """
     html_content += "</ul></body></html>"
