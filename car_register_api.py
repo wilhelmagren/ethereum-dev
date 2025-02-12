@@ -16,7 +16,6 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-sql = sqlite3.connect("cars.db")
 
 @app.get("/")
 async def read_root():
@@ -26,6 +25,7 @@ async def read_root():
 @app.get("/cars", response_class=HTMLResponse)
 async def read_cars():
 
+    sql = sqlite3.connect("cars.db")
     cursor = sql.cursor()
     cursor.execute("SELECT * FROM cars")
     cars = cursor.fetchall()

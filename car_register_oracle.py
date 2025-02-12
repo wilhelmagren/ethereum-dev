@@ -16,6 +16,7 @@ UPDATE_QUERY = "UPDATE cars SET owner = ?, previous_owner = ?, price = ? WHERE i
 
 
 def update_register(event, sql):
+    print(event)
     cursor = sql.cursor()
     event_args = event.args
     buyer = event_args.buyer

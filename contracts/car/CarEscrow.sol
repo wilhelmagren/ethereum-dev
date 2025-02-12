@@ -93,12 +93,13 @@ contract CarEscrow {
         _executed = true;
 
         _sellerToken.mint(_seller, _price);
-        _deposit = 0;
 
         // We need to mint some tokens for the buyer since they deposited too much.
         if (_deposit > _price) {
             _buyerToken.mint(_buyer, _deposit - _price);
         }
+
+        _deposit = 0;
 
         emit CarOwnerTransfer(_buyer, _seller, _carId, _price);
     }
@@ -124,6 +125,13 @@ contract CarEscrow {
         if(_demands()) {
             _executeDeal();
         }
+    }
+
+    /**
+     * @dev Get the amount of money that has been deposited.
+     */
+    function depositedAmount() external view returns (uint256) {
+        return _deposit;
     }
 
     /**
