@@ -185,7 +185,7 @@
     successMessage = '';
     errorMessage = '';
     try {
-      const response = await fetch('http://localhost:8000/tokenize', {
+      const response = await fetch('http://localhost:8000/_api/tokenize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
