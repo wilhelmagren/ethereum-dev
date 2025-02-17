@@ -189,3 +189,6 @@ ACCOUNTS.txt
 cars_db.json
 
 cars.db
+
+node_modules/
+.svelte-kit/
