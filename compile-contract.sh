@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-solc --abi --bin $1 -o target --overwrite || exit 1
+solc --abi --bin --bin-runtime $1 -o target --overwrite || exit 1
 
 exit 0
