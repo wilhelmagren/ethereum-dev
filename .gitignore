@@ -192,3 +192,5 @@ cars.db
 
 node_modules/
 .svelte-kit/
+
+*.db
